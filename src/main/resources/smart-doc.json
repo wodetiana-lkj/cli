@@ -1,0 +1,5 @@
+{
+  "outPath": "./doc/",
+  "isStrict": false,
+  "allInOne": true
+}
