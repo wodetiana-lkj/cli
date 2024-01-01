@@ -6,9 +6,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandlerImpl;
-import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
-import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
+import top.tsview.demo.config.handler.LogoutSuccessHandler;
+import top.tsview.demo.config.handler.UnAuthenticatedHandler;
+import top.tsview.demo.config.handler.UnAuthorizedHandler;
+import top.tsview.demo.utils.SpringUtil;
 
 /**
  * 安全处理配置
@@ -35,11 +36,11 @@ public class SecurityConfiguration {
                 .anyRequest().authenticated().and()
                 .exceptionHandling()
                 // 匿名用户无权限
-                .authenticationEntryPoint(new BasicAuthenticationEntryPoint())
+                .authenticationEntryPoint(SpringUtil.getBean(UnAuthenticatedHandler.class))
                 // 认证过的用户无权限
-                .accessDeniedHandler(new AccessDeniedHandlerImpl()).and()
+                .accessDeniedHandler(SpringUtil.getBean(UnAuthorizedHandler.class)).and()
                 // 登出处理
-                .logout().logoutSuccessHandler(new SimpleUrlLogoutSuccessHandler());
+                .logout().logoutSuccessHandler(SpringUtil.getBean(LogoutSuccessHandler.class));
 
         return httpSecurity.build();
     }
