@@ -20,4 +20,7 @@ public class ResultModel<T> implements Serializable {
         return new ResultModel<>(200, null, data);
     }
 
+    public static <R> ResultModel<R> failure(Integer code, String message) {
+        return new ResultModel<>(code, message, null);
+    }
 }
