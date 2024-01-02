@@ -2,6 +2,7 @@ package top.tsview.demo.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -11,7 +12,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import top.tsview.demo.config.handler.JwtFilter;
-import top.tsview.demo.config.handler.LogoutSuccessHandler;
+import top.tsview.demo.config.handler.LogoutSuccessHandlerImpl;
 import top.tsview.demo.config.handler.UnAuthenticatedHandler;
 import top.tsview.demo.config.handler.UnAuthorizedHandler;
 import top.tsview.demo.utils.SpringUtil;
@@ -38,8 +39,8 @@ public class SecurityConfiguration {
                 .addFilterBefore(corsFilter(), UsernamePasswordAuthenticationFilter.class)
                 // 配置过滤认证规则
                 .authorizeRequests()
-                .antMatchers("/**").anonymous()
-                .antMatchers("/**").permitAll()
+                .antMatchers("/test/login").anonymous()
+                // .antMatchers("/**").permitAll()
                 .anyRequest().authenticated().and()
                 .exceptionHandling()
                 // 匿名用户无权限
@@ -47,7 +48,7 @@ public class SecurityConfiguration {
                 // 认证过的用户无权限
                 .accessDeniedHandler(SpringUtil.getBean(UnAuthorizedHandler.class)).and()
                 // 登出处理
-                .logout().logoutSuccessHandler(SpringUtil.getBean(LogoutSuccessHandler.class));
+                .logout().logoutSuccessHandler(SpringUtil.getBean(LogoutSuccessHandlerImpl.class));
 
         // jwt Filter解析信息
         httpSecurity.addFilterBefore(SpringUtil.getBean(JwtFilter.class), UsernamePasswordAuthenticationFilter.class);
@@ -59,10 +60,13 @@ public class SecurityConfiguration {
      */
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return webSecurity -> webSecurity.ignoring().anyRequest();
+        return webSecurity -> webSecurity.ignoring().antMatchers(HttpMethod.GET,"**/*.html");
     }
 
 
+    /**
+     * 跨域操作
+     */
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
@@ -78,7 +82,6 @@ public class SecurityConfiguration {
         // 添加映射路径，拦截一切请求
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
-        // 返回新的CorsFilter
         return new CorsFilter(source);
     }
 }

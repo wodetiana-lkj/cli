@@ -6,19 +6,23 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @Slf4j
 @SpringBootTest
-public class JwtUtilTests {
+class JwtUtilTests {
 
     @Test
-    public String getToken() {
-        String token = JwtUtil.getToken("abc123");
-        log.info("token => {}", token);
-        return token;
+    void token() {
+        String token = getToken();
     }
 
     @Test
-    public void validate() {
-        String claims = JwtUtil.verifyToken(getToken());
+    void validate() {
+        String claims = JwtUtil.verifyToken(getToken(), String.class);
         log.info("payload => {}", claims);
+    }
+
+    private String getToken() {
+        String token = JwtUtil.getToken("abc123");
+        log.info("token => {}", token);
+        return token;
     }
 
 }

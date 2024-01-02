@@ -1,7 +1,6 @@
 package top.tsview.demo.utils;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
@@ -10,6 +9,7 @@ import org.jose4j.lang.JoseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
@@ -41,15 +41,18 @@ public class JwtUtil {
         }
     }
 
-    public static <T> T verifyToken(String token) {
+    public static <T> T verifyToken(String token, Class<T> aClass) {
+        if (!StringUtils.hasText(token)) {
+            return null;
+        }
+
         JsonWebSignature jws = new JsonWebSignature();
         setHMAC256(jws);
         try {
             jws.setCompactSerialization(token);
             if (jws.verifySignature()) {
                 Gson gson = SpringUtil.getBean(Gson.class);
-                return gson.fromJson(jws.getPayload(), new TypeToken<T>() {
-                }.getType());
+                return gson.fromJson(jws.getPayload(), aClass);
             } else {
                 // TODO 自定义认证异常
                 throw new RuntimeException();
@@ -67,6 +70,11 @@ public class JwtUtil {
         jws.setKey(SpringUtil.getBean(Key.class));
     }
 
+    /**
+     * @param jws jws
+     * @deprecated
+     */
+    @Deprecated
     private static void setES256(JsonWebSignature jws) {
         KeyPair keyPair = generateKeyPair();
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256);

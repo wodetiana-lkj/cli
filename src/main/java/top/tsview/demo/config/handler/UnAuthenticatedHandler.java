@@ -6,6 +6,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 import top.tsview.demo.protocol.ResultModel;
+import top.tsview.demo.utils.HttpResponseUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,10 +15,11 @@ import java.io.IOException;
 @Slf4j
 @Component
 public class UnAuthenticatedHandler implements AuthenticationEntryPoint {
+
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
         log.error("authenticate error", authException);
         HttpStatus unAuth = HttpStatus.UNAUTHORIZED;
-        response.getWriter().println(ResultModel.failure(unAuth.value(), unAuth.getReasonPhrase()));
+        HttpResponseUtil.handleJson(response, ResultModel.failure(unAuth.value(), unAuth.getReasonPhrase()));
     }
 }
