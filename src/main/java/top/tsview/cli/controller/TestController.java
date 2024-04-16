@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 public class TestController {
 
     @RequestMapping(value = "/get", method = RequestMethod.GET)
-    public ResultModel<TestVO> get(@Validated TestDTO dto) {
+    public ResultModel<TestVO> get(TestDTO dto) {
         log.info("request => {}", dto);
         return ResultModel.ok(new TestVO(1L, "test", LocalDateTime.now()));
     }
