@@ -1,10 +1,13 @@
 package top.tsview.cli.utils;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.HashSet;
 
 @Slf4j
 public class FileUtil {
@@ -70,5 +73,28 @@ public class FileUtil {
 
     public static String getSuffix(String path) {
         return path.substring(path.lastIndexOf("."));
+    }
+
+    @SneakyThrows
+    public static Collection<File> getAllFile(File file) {
+        Collection<File> list = new HashSet<>();
+        if (!file.exists()) {
+            log.info("path: {} not exist", file.toPath());
+            return list;
+        }
+
+        if (file.isDirectory()) {
+            File[] files = file.listFiles();
+            for (File subFile : files) {
+                if (subFile.isDirectory()) {
+                    list.addAll(getAllFile(subFile));
+                }else {
+                    list.add(subFile);
+                }
+            }
+        }else {
+            list.add(file);
+        }
+        return list;
     }
 }
